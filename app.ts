@@ -1,0 +1,11 @@
+import express from 'express'
+import morgan from 'morgan'
+const todosRouter = require('./routes/todosRouter')
+
+const app = express()
+//1)Middlewares
+app.use(morgan('dev'))
+app.use(express.json())
+app.use('/api/todos', todosRouter)
+
+export default app
