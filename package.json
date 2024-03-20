@@ -24,6 +24,7 @@
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^5.13.22",
         "morgan": "^1.10.0",
+        "nodemailer": "^6.9.13",
         "nodemon": "^3.1.0",
         "validator": "^13.11.0"
     },
@@ -33,6 +34,7 @@
         "@types/jsonwebtoken": "^9.0.6",
         "@types/morgan": "^1.9.9",
         "@types/node": "^20.11.28",
+        "@types/nodemailer": "^6.4.14",
         "@types/validator": "^13.11.9",
         "ts-node": "^10.9.2"
     }

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import User from '../models/userModel'
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
+import sendEmail from '../utils/email'
 
 interface AuthenticatedRequest extends Request {
     user?: any
@@ -136,6 +137,7 @@ exports.restrictTo = (roles: string) => {
         }
     }
 }
+// Import your sendEmail function
 
 exports.forgetPassword = async (
     req: Request,
@@ -143,24 +145,42 @@ exports.forgetPassword = async (
     next: NextFunction
 ) => {
     try {
-        const user = await User.findOne({ email: req.body.email })
-        if (!req.body.email) {
+        const { email } = req.body;
+        if (!email) {
             return res.status(400).json({
                 status: 'fail',
                 message: 'Please enter your email',
-            })
+            });
         }
+
+        const user = await User.findOne({ email });
+
         if (!user) {
             return res.status(404).json({
                 status: 'fail',
-                message: `There is no user with this email: ${req.body.email}`,
-            })
+                message: `There is no user with this email: ${email}`,
+            });
         }
-        const resetToken = user.createResetPasswordToken()
-        console.log(resetToken)
+
+        const resetToken = user.createResetPasswordToken();
+        await user.save({ validateBeforeSave: false });
+
+        const resetURL: string = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+        await sendEmail({
+            email: user.email,
+            subject: 'Password Reset',
+            message: `Please click on the following link to reset your password: ${resetURL}`,
+        });
+
         res.status(200).json({
             status: 'success',
-            resetToken
-        })
-    } catch (err) {}
-}
+            message: 'Token sent to email!',
+        });
+    } catch (error) {
+        console.error('Error in forgetPassword:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Internal Server Error',
+        });
+    }
+};
