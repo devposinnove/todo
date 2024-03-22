@@ -141,20 +141,17 @@ describe('Database Connection', () => {
         expect(response.status).toBe(200)
         expect(response.body.status).toBe('success')
     })
+    test('Forget password || Find user using email', async () => {
+        const response = await request(app).post('/api/users/forgetpassword').send({
+            email: 'mugishajoseph08@gmail.com'
+        })
+        expect(response.status).toBe(200)
+    })
     test('Delete User', async () => {
         const response = await request(app)
             .delete(`/api/users/${userId}`)
             .set('Authorization', `Bearer ${gToken}`)
         expect(response.status).toBe(204)
     })
-    test('Forget password || Find user using email', async () => {
-        const response = await request(app).post('/api/users/forgetpassword').send({
-            name: 'joseph',
-            email: 'mugishajoseph08@gmail.com',
-            password: 'walmond',
-            confirmPassword: 'walmond',
-            role: 'admin',
-        })
-        expect(response.status).toBe(500)
-    })
+
 })

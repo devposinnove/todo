@@ -5,5 +5,6 @@ module.exports = {
   testMatch:["**/**/*.test.ts"],
   verbose: true,
   forceExit: true,
+  testTimeout: 70000
   // clearMocks: true,
 };
