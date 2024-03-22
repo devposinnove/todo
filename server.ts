@@ -10,16 +10,13 @@ interface EnvConfig {
     DATABASE_PASSWORD: string
 }
 
-const { PORT, DATABASE, DATABASE_PASSWORD } =
+const { PORT, DATABASE } =
     process.env as unknown as EnvConfig
-const DB = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD)
+// const DB = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD)
 
 mongoose
-    .connect(DB, {
+    .connect(DATABASE, {
         useNewUrlParser: true,
-        useCreateIndex: true,
-        useFindAndModify: false,
-        useUnifiedTopology: true,
     })
     .then(() => {
         console.log('DB connection established')
