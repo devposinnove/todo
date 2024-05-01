@@ -13,7 +13,7 @@ exports.GetAllUsers = async (req: Request, res: Response): Promise<void> => {
     } catch (err) {
         res.status(404).json({
             status: 'fail',
-            message: 'User not found',
+            message: err,
         })
     }
 }

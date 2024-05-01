@@ -16,7 +16,7 @@ router
     .post(authController.protect,(req: Request, res: Response) => {
         const { error } = todoSchema.validate(req.body)
         if (error) {
-            return res.status(400).json({ error: error.details[0].message })
+            return res.status(400).json({ error: "error.details[0].message" })
         }
         CreateTodos(req,res)
     })

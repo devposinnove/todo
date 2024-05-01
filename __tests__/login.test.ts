@@ -4,19 +4,20 @@ dotenv.config({ path: './config.env' })
 import mongoose from 'mongoose'
 import app from '../app'
 
-// interface EnvConfig {
-//     PORT: string | number;
-//     DATABASE: string;
-//     DATABASE_PASSWORD: string;
-// }
+interface EnvConfig {
+    PORT: string | number
+    DATABASE: string
+    DATABASE_PASSWORD: string
+}
 let gToken = ''
 describe('Database Connection', () => {
     beforeAll(async () => {
         try {
             console.log('Connecting to MongoDB...')
-            // const { DATABASE, DATABASE_PASSWORD } = process.env as unknown as EnvConfig;
-            // const DB = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD);
-            await mongoose.connect('mongodb://127.0.0.1:27017/Todo-dbs', {
+            const { DATABASE, DATABASE_PASSWORD } =
+                process.env as unknown as EnvConfig
+            const DB = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD)
+            await mongoose.connect(DB, {
                 useNewUrlParser: true,
                 useCreateIndex: true,
                 useFindAndModify: false,
@@ -141,17 +142,43 @@ describe('Database Connection', () => {
         expect(response.status).toBe(200)
         expect(response.body.status).toBe('success')
     })
+    test('Get single User', async () => {
+        const response = await request(app)
+            .get(`/api/users/${userId}`)
+            .set('Authorization', `Bearer ${gToken}`)
+        expect(response.status).toBe(200)
+        expect(response.body.status).toBe('success')
+    })
+    test('Forget password || Find user while email is missing', async () => {
+        const response = await request(app)
+            .post('/api/users/forgetPassword')
+            .send({})
+        expect(response.status).toBe(400)
+        expect(response.body.status).toBe('fail')
+        expect(response.body.message).toBe('Please enter your email')
+    })
+    test('Forget password || Find user using invalid email', async () => {
+        const response = await request(app)
+            .post('/api/users/forgetpassword')
+            .send({
+                email: 'mugishajosepfh08@gmail.com',
+            })
+        expect(response.status).toBe(404)
+    })
     test('Forget password || Find user using email', async () => {
-        const response = await request(app).post('/api/users/forgetpassword').send({
-            email: 'mugishajoseph08@gmail.com'
-        })
+        const response = await request(app)
+            .post('/api/users/forgetpassword')
+            .send({
+                email: 'mugishajoseph08@gmail.com',
+            })
         expect(response.status).toBe(200)
     })
+
     test('Delete User', async () => {
         const response = await request(app)
             .delete(`/api/users/${userId}`)
             .set('Authorization', `Bearer ${gToken}`)
         expect(response.status).toBe(204)
     })
-
+    
 })

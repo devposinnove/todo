@@ -1,0 +1,341 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Todo APIs Documentation",
+        "description": "APIs for Todo Project",
+        "contact": {
+            "name": "MUGISHA Joseph",
+            "email": "mugishajoseph092@gmail.com",
+            "telephone": "+250792418795"
+        },
+        "license": {
+            "name": "ISC"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:4000",
+            "description": "Local Development Server for Swagger"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Endpoints for user registration, login, and user management."
+        },
+        {
+            "name": "Todos",
+            "description": "Manage todos, including creation, retrieval, update, deletion."
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "basePath": "/api",
+    "schemes": ["http"],
+    "paths": {
+        "/api/users/signup": {
+            "post": {
+                "summary": "Create an account",
+                "tags": ["Authentication"],
+                "security": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "mugishajoseph092@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "walmond@123"
+                                    },
+                                    "confirmPassword": {
+                                        "type": "string",
+                                        "example": "walmond@123"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "mugisha"
+                                    }
+                                },
+                                "required": ["email", "password", "name"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": { "type": "string" },
+                                        "email": { "type": "string" },
+                                        "password": { "type": "string" },
+                                        "confirmPassword": { "type": "string" }
+                                    },
+                                    "required": [
+                                        "name",
+                                        "email",
+                                        "password",
+                                        "confirmPassword"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/users/login": {
+            "post": {
+                "summary": "User Login",
+                "tags": ["Authentication"],
+                "security": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "mugishajoseph092@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "walmond@123"
+                                    }
+                                },
+                                "required": ["email", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "JWT token for authentication"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "Authentication type (e.g., Bearer)"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "User's full name"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "description": "User's email address"
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "description": "User's role or access level"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "summary": "Get all users for the admin panel",
+                "tags": ["Authentication"],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized request"
+                    }
+                }
+            }
+        },
+
+        "/api/users/{id}": {
+            "delete": {
+                "summary": "Delete a certain user by Admin",
+                "tags": ["Authentication"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized request"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Get user details by ID",
+                "tags": ["Authentication"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized request"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update a User",
+                "tags": ["Authentication"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": { "type": "string" },
+                                    "password": { "type": "string" },
+                                    "confirmPassword": { "type": "string" },
+                                    "email": { "type": "string" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "400": {
+            "description": "Bad Request",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "status": { "type": "string" },
+                            "message": { "type": "string" }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "api/todos/": {
+        "post": {
+            "summary": "Create a Todo",
+            "tags": ["Todos"],
+            "security": [],
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "type": "string",
+                                    "example": "post blog post"
+                                },
+                                "due_date": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "example": "2024-03-25T08:00:00Z"
+                                },
+                                "completed": {
+                                    "type": "boolean",
+                                    "example": false
+                                }
+                            },
+                            "required": ["title"]
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "201": {
+                    "description": "Created",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": { "type": "string" },
+                                    "due_date": { "type": "string" },
+                                    "completed": { "type": "boolean" },
+                                    "_id": { "type": "string" }
+                                },
+                                "required": ["title", "due_date", "completed", "_id"]
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request"
+                }
+            }
+        }
+    }}

@@ -4,19 +4,19 @@ import mongoose from 'mongoose'
 import request from 'supertest'
 import app from '../app'
 
-// interface EnvConfig {
-//     PORT: string | number;
-//     DATABASE: string;
-//     DATABASE_PASSWORD: string;
-// }
+interface EnvConfig {
+    PORT: string | number;
+    DATABASE: string;
+    DATABASE_PASSWORD: string;
+}
 
 describe('Database Connection', () => {
     beforeAll(async () => {
         try {
             console.log('Connecting to MongoDB...')
-            // const { DATABASE, DATABASE_PASSWORD } = process.env as unknown as EnvConfig;
-            // const DB = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD);
-            await mongoose.connect('mongodb://127.0.0.1:27017/Todo-dbs', {
+            const { DATABASE, DATABASE_PASSWORD } = process.env as unknown as EnvConfig;
+            const DB = DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD);
+            await mongoose.connect(DB, {
                 useNewUrlParser: true,
                 useCreateIndex: true,
                 useFindAndModify: false,

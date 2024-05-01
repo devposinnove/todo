@@ -3,6 +3,7 @@ import User from '../models/userModel'
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import sendEmail from '../utils/email'
+import crypto from 'crypto'
 
 interface AuthenticatedRequest extends Request {
     user?: any
@@ -139,42 +140,83 @@ exports.forgetPassword = async (
     next: NextFunction
 ) => {
     try {
-        const { email } = req.body;
+        const { email } = req.body
         if (!email) {
             return res.status(400).json({
                 status: 'fail',
                 message: 'Please enter your email',
-            });
+            })
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email })
 
         if (!user) {
             return res.status(404).json({
                 status: 'fail',
                 message: `There is no user with this email: ${email}`,
-            });
+            })
         }
 
-        const resetToken = user.createResetPasswordToken();
-        await user.save({ validateBeforeSave: false });
+        const resetToken = user.createResetPasswordToken()
+        await user.save({ validateBeforeSave: false })
 
-        const resetURL: string = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+        const resetURL: string = `${req.protocol}://${req.get(
+            'host'
+        )}/api/users/resetPassword/${resetToken}`
         await sendEmail({
             email: user.email,
             subject: 'Password Reset',
             message: `Please click on the following link to reset your password: ${resetURL}`,
-        });
+        })
 
         res.status(200).json({
             status: 'success',
             message: 'Token sent to email!',
-        });
+        })
     } catch (error) {
-        console.error('Error in forgetPassword:', error);
         res.status(500).json({
             status: 'error',
-            message: 'Internal Server Error',
-        });
+            message: error,
+        })
     }
-};
+}
+exports.resetPassword = async (req: Request, res: Response) => {
+    const currentDate = new Date()
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(req.params.token)
+        .digest('hex')
+    const user = await User.findOne({
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { $gt: currentDate },
+    })
+    console.log(user,hashedToken)
+
+    if (!user) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Invalid or expired token',
+        })
+    }
+    const { password, confirmPassword }: any = req.body
+    if (!password || !confirmPassword) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Password and confirmPassword are required fields',
+        })
+    }
+    user.password = password
+    user.confirmPassword = confirmPassword
+    user.passwordResetToken = undefined
+    user.passwordResetExpires = undefined
+    await user.save()
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || '', {
+        expiresIn: process.env.JWT_EXPIRESIN,
+    })
+    res.status(200).json({
+        status: 'success',
+        message: 'Password reset successfully',
+        token: token,
+    })
+}
