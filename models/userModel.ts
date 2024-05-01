@@ -59,6 +59,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>({
         type: Date,
         default: Date.now,
     },
+    todos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Todos' }], 
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
 })

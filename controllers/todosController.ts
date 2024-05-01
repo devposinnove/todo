@@ -2,13 +2,17 @@ import { Request, Response } from 'express'
 import Todos from '../models/todos'
 
 
+interface AuthenticatedRequest extends Request {
+    user?: any
+}
+
 export const GetAllTodos = async (
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response
 ): Promise<void> => {
     try {
         
-        const todos = await Todos.find()
+        const todos = await Todos.find({ createdBy: req.user._id });
         res.status(200).json({
             status: 'success',
             results: todos.length,
@@ -16,6 +20,9 @@ export const GetAllTodos = async (
                 todos,
             },
         })
+        console.log(req.user._id);
+        
+        
     } catch (err) {
         res.status(404).json({
             status: 'fail',
@@ -25,11 +32,13 @@ export const GetAllTodos = async (
 }
 
 export const CreateTodos = async (
-    req: Request,
+    req: AuthenticatedRequest,
     res: Response
 ): Promise<void> => {
     try {
-        const todo = await Todos.create(req.body)
+        const { title } = req.body;
+        const { _id: createdBy } = req.user._id;
+        const todo = await Todos.create({title,createdBy})
         console.log(todo)
         res.status(201).json({
             status: 'success',

@@ -12,7 +12,7 @@ import todoSchema from '../validation/todoValidation'
 const router = express.Router()
 router
     .route('/')
-    .get(GetAllTodos)
+    .get(authController.protect,GetAllTodos)
     .post(authController.protect,(req: Request, res: Response) => {
         const { error } = todoSchema.validate(req.body)
         if (error) {
