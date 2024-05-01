@@ -12,7 +12,7 @@ import todoSchema from '../validation/todoValidation'
 const router = express.Router()
 router
     .route('/')
-    .get(authController.protect,GetAllTodos)
+    .get(GetAllTodos)
     .post(authController.protect,(req: Request, res: Response) => {
         const { error } = todoSchema.validate(req.body)
         if (error) {
@@ -21,6 +21,6 @@ router
         CreateTodos(req,res)
     })
 
-router.route('/:id').get(GetTodo).patch(authController.protect,UpdateTodo).delete(authController.protect,DeleteTodo)
+router.route('/:id').get(authController.protect,GetTodo).patch(authController.protect,UpdateTodo).delete(authController.protect,DeleteTodo)
 
 export default router
