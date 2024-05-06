@@ -70,10 +70,15 @@ exports.login = async (req: Request, res: Response, next: NextFunction) => {
             expiresIn: process.env.JWT_EXPIRESIN,
         }
     )
+    const decodedPayload: any = jwt.decode(token);
+    console.log(decodedPayload.id);
+    
+    const user = await User.findById(decodedPayload.id);
     res.status(200).json({
-        status: 'success',
-        token: token,
-    })
+      status: 'success',
+      token: token,
+      user,
+    });
 }
 
 exports.protect = async (
